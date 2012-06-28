@@ -16,7 +16,11 @@ try {
             if ($user_id === FALSE) {
               echo 'ERROR: Unable to authenticate user';
             } else {
-              echo 'User ID: '. $user_id;
+              echo '<pre>';
+              $api->get_app_token('profile/public');
+              $profile = $api->get_basic_profile($user_id);
+              var_dump($profile);
+              echo '</pre>';
             }
 
         } else {
