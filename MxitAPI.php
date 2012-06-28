@@ -1,7 +1,7 @@
 <?php
 
 /**
- * MXit API PHP Wrapper - version 1.1
+ * MXit API PHP Wrapper - version 1.2
  *
  * Written by: Ashley Kleynhans <ashley.kleynhans@mxit.com>
  *
@@ -60,7 +60,7 @@ class MxitAPI {
     public $error;
 
     public function __construct($key, $secret) {
-        $this->_version = '1.0';
+        $this->_version = '1.2';
         $this->_app_key = $key;
         $this->_app_secret = $secret;
         $this->error = FALSE;
@@ -286,11 +286,12 @@ class MxitAPI {
                 $header = json_decode($header);
                 $payload = json_decode($payload);
 
-                if ($payload->aud != $key)
+                if ($payload->aud != $this->_app_key)
                     return FALSE;
 
-                if ($payload->exp < time())
-                    return FALSE;
+                // Time zone differences could potentially pose a problem, so disabling for now
+                /*if ($payload->exp < time())
+                    return FALSE;*/
 
                 return $payload->user_id;
             } else {
