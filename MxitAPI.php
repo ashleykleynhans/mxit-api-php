@@ -1,7 +1,7 @@
 <?php
 
 /**
- * MXit API PHP Wrapper - version 1.2.1
+ * MXit API PHP Wrapper - version 1.2.2
  *
  * Written by: Ashley Kleynhans <ashley@mxit.com>
  *
@@ -71,6 +71,8 @@ class MxitAPI {
         $this->content_type = NULL;
         $this->result = NULL;
         $this->error = FALSE;
+
+        $fields = '';
 
         if (($method == 'POST' || $method == 'PUT' || $method == 'DELETE') && $params != '') {
             $fields = (is_array($params)) ? http_build_query($params) : $params;
