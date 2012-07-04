@@ -1,9 +1,9 @@
 <?php
 
 /**
- * MXit API PHP Wrapper - version 1.2
+ * MXit API PHP Wrapper - version 1.2.1
  *
- * Written by: Ashley Kleynhans <ashley.kleynhans@mxit.com>
+ * Written by: Ashley Kleynhans <ashley@mxit.com>
  *
  * Copyright 2012 MXit Lifestyle (Pty) Ltd.
  *
