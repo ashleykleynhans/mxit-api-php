@@ -69,7 +69,7 @@ class MxitAPI {
     private function _call_api($url, $method='POST', $params='', $decode=TRUE) {
         $this->http_status = NULL;
         $this->content_type = NULL;
-        $rhis->result = NULL;
+        $this->result = NULL;
         $this->error = FALSE;
 
         if (($method == 'POST' || $method == 'PUT' || $method == 'DELETE') && $params != '') {
