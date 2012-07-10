@@ -1,7 +1,7 @@
 <?php
 
 /**
- * MXit API PHP Wrapper - version 1.2.2
+ * MXit API PHP Wrapper - version 1.2.3
  *
  * Written by: Ashley Kleynhans <ashley@mxit.com>
  *
@@ -60,7 +60,7 @@ class MxitAPI {
     public $error;
 
     public function __construct($key, $secret) {
-        $this->_version = '1.2';
+        $this->_version = '1.2.3';
         $this->_app_key = $key;
         $this->_app_secret = $secret;
         $this->error = FALSE;
@@ -119,7 +119,7 @@ class MxitAPI {
             $this->error = TRUE;
         }
 
-        $this->result = $decode === TRUE ? json_decode($result) : $result;
+        $this->result = (($decode === TRUE) && (is_json($result) === TRUE)) ? json_decode($result) : $result;
     }
 
     private function _api_headers($format='json', $remove_expect=FALSE) {
