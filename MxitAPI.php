@@ -1,7 +1,7 @@
 <?php
 
 /**
- * MXit API PHP Wrapper - version 1.2.3
+ * MXit API PHP Wrapper - version 1.2.4
  *
  * Written by: Ashley Kleynhans <ashley@mxit.com>
  *
@@ -60,7 +60,7 @@ class MxitAPI {
     public $error;
 
     public function __construct($key, $secret) {
-        $this->_version = '1.2.3';
+        $this->_version = '1.2.4';
         $this->_app_key = $key;
         $this->_app_secret = $secret;
         $this->error = FALSE;
@@ -211,7 +211,7 @@ class MxitAPI {
             $this->_access_token = $this->result->access_token;
             $this->_token_type = $this->result->token_type;
             $this->_expires_in = $this->result->expires_in;
-            $this->_refresh_token = $this->result->refresh_token;
+            $this->_refresh_token = isset($this->result->refresh_token) ? $this->result->refresh_token : null;
             $this->_scope = $this->result->scope;
 
             // Only applicable to OpenID token requests
@@ -245,7 +245,7 @@ class MxitAPI {
             $this->_access_token = $this->result->access_token;
             $this->_token_type = $this->result->token_type;
             $this->_expires_in = $this->result->expires_in;
-            $this->_refresh_token = $this->result->refresh_token;
+            $this->_refresh_token = isset($this->result->refresh_token) ? $this->result->refresh_token : null;
         }
     }
 

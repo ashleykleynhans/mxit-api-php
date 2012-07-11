@@ -26,7 +26,7 @@ try {
         } else {
             echo 'Authentication failed<br />';
             echo 'Error: '. $_GET['error'] .'<br />';
-            echo 'Error Description: '. $_GET['error_desciption'] .'<br />';
+            echo 'Error Description: '. $_GET['error_description'] .'<br />';
         }
 
     } else {
