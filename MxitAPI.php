@@ -1,7 +1,7 @@
 <?php
 
 /**
- * MXit API PHP Wrapper - version 1.2.4
+ * MXit API PHP Wrapper - version 1.2.5
  *
  * Written by: Ashley Kleynhans <ashley@mxit.com>
  *
@@ -45,6 +45,8 @@ function is_json($json) {
 
 class MxitAPI {
     private $_version;
+    private $_base_outh_url;
+    private $_base_api_url;
     private $_app_key;
     private $_app_secret;
     private $_token_type;
@@ -60,9 +62,13 @@ class MxitAPI {
     public $error;
 
     public function __construct($key, $secret) {
-        $this->_version = '1.2.4';
+        $this->_version = '1.2.5';
+        $this->_base_outh_url = 'https://auth.mxit.com/';
+        $this->_base_api_url = 'http://api.mxit.com/';
+
         $this->_app_key = $key;
         $this->_app_secret = $secret;
+
         $this->error = FALSE;
     }
 
@@ -150,7 +156,7 @@ class MxitAPI {
      *   is used to obtain the access token.
      */
     public function request_access($redirect_uri, $scope, $state='') {
-        $url = "https://auth.mxit.com/authorize?response_type=code&client_id=". $this->_app_key;
+        $url = $this->_base_outh_url ."authorize?response_type=code&client_id=". $this->_app_key;
         $url .= "&redirect_uri=". urlencode($redirect_uri);
         $url .= "&scope=". urlencode($scope);
 
@@ -195,7 +201,7 @@ class MxitAPI {
      *   Request the actual token from the OAuth2 server
      */
     public function get_user_token($code, $redirect_uri) {
-        $url = "https://auth.mxit.com/token";
+        $url = $this->_base_outh_url ."token";
 
         $params = array('grant_type'   => 'authorization_code',
                         'code'         => $code,
@@ -224,7 +230,7 @@ class MxitAPI {
      *   Get an access token for an application, to perform an API Request
      */
     public function get_app_token($scope, $grant_type='client_credentials', $username='', $password='') {
-        $url = "https://auth.mxit.com/token";
+        $url = $this->_base_outh_url ."token";
 
         $this->_headers = array();
         $this->_headers[] = 'Authorization: Basic '. base64_encode($this->_app_key .':'. $this->_app_secret);
@@ -323,7 +329,7 @@ class MxitAPI {
     public function get_user_id($login) {
         $this->_check_scope('get_user_id', 'profile/public');
 
-        $url = "http://api.mxit.com/user/lookup/". $login;
+        $url = $this->_base_api_url ."user/lookup/". $login;
         
         $this->_api_headers();
         $this->_call_api($url, 'GET');
@@ -343,7 +349,7 @@ class MxitAPI {
     public function get_status($login) {
         $this->_check_scope('get_status', 'profile/public');
 
-        $url = "http://api.mxit.com/user/public/statusmessage/". $login;
+        $url = $this->_base_api_url ."user/public/statusmessage/". $login;
         
         $this->_api_headers();
         $this->_call_api($url, 'GET');
@@ -363,7 +369,7 @@ class MxitAPI {
     public function get_display_name($login) {
         $this->_check_scope('get_display_name', 'profile/public');
 
-        $url = "http://api.mxit.com/user/public/displayname/". $login;
+        $url = $this->_base_api_url ."user/public/displayname/". $login;
         
         $this->_api_headers();
         $this->_call_api($url, 'GET');
@@ -383,7 +389,7 @@ class MxitAPI {
     public function get_avatar($login) {
         $this->_check_scope('get_avatar', 'profile/public');
 
-        $url = "http://api.mxit.com/user/public/avatar/". $login;
+        $url = $this->_base_api_url ."user/public/avatar/". $login;
         
         $this->_api_headers();
         $this->_call_api($url, 'GET', '', FALSE);
@@ -405,7 +411,7 @@ class MxitAPI {
     public function get_basic_profile($mxitid) {
         $this->_check_scope('get_basic_profile', 'profile/public');
 
-        $url = "http://api.mxit.com/user/profile/". $mxitid;
+        $url = $this->_base_api_url ."user/profile/". $mxitid;
         
         $this->_api_headers();
         $this->_call_api($url, 'GET');
@@ -430,12 +436,11 @@ class MxitAPI {
                         'From'              => $from,
                         'To'                => $to);
 
-        $url = "http://api.mxit.com/message/send/";
+        $url = $this->_base_api_url ."message/send/";
         
         $this->_api_headers();
         $this->_call_api($url, 'POST', json_encode($params));
     }
-
 
     /**
      *   ----------------------------------------------------------------------------------
@@ -454,7 +459,7 @@ class MxitAPI {
         if ($bypass_scope_check === FALSE)
             $this->_check_scope('get_full_profile', 'profile/private');
 
-        $url = "http://api.mxit.com/user/profile";
+        $url = $this->_base_api_url ."user/profile";
         
         $this->_api_headers();
         $this->_call_api($url, 'GET');
@@ -474,7 +479,7 @@ class MxitAPI {
     public function update_profile($data) {
         $this->_check_scope('update_profile', 'profile/write');
 
-        $url = "http://api.mxit.com/user/profile";
+        $url = $this->_base_api_url ."user/profile";
         
         $this->_api_headers();
         $this->_call_api($url, 'PUT', json_encode($data));
@@ -496,7 +501,7 @@ class MxitAPI {
     public function add_contact($mxitid) {
         $this->_check_scope('add_contact', 'contact/invite');
 
-        $url = "http://api.mxit.com/user/socialgraph/contact/". $mxitid;
+        $url = $this->_base_api_url ."user/socialgraph/contact/". $mxitid;
         
         $this->_api_headers();
         $this->_call_api($url, 'PUT');
@@ -520,7 +525,7 @@ class MxitAPI {
     public function get_contact_list($filter='', $skip=0, $count=0) {
         $this->_check_scope('get_contact_list', 'graph/read');
 
-        $url = "http://api.mxit.com/user/socialgraph/contactlist";
+        $url = $this->_base_api_url ."user/socialgraph/contactlist";
 
         if ($filter != '')
             $url .= '?filter='. $filter;
@@ -555,7 +560,7 @@ class MxitAPI {
     public function get_friend_suggestions() {
         $this->_check_scope('get_friend_suggestions', 'graph/read');
 
-        $url = "http://api.mxit.com/user/socialgraph/suggestions";
+        $url = $this->_base_api_url ."user/socialgraph/suggestions";
 
         $this->_api_headers('xml');
         $this->_call_api($url, 'GET');
@@ -575,7 +580,7 @@ class MxitAPI {
     public function set_status($message) {
         $this->_check_scope('set_status', 'status/write');
 
-        $url = "http://api.mxit.com/user/statusmessage";
+        $url = $this->_base_api_url ."user/statusmessage";
 
         $this->_api_headers();
         $this->_call_api($url, 'PUT', json_encode($message));   
@@ -593,7 +598,7 @@ class MxitAPI {
     public function set_avatar($base64_encoded_avatar) {
         $this->_check_scope('set_avatar', 'avatar/write');
 
-        $url = "http://api.mxit.com/user/avatar";
+        $url = $this->_base_api_url ."user/avatar";
         $xml = '<base64Binary xmlns="http://schemas.microsoft.com/2003/10/Serialization/">'. $base64_encoded_avatar .'</base64Binary>';
 
         $this->_api_headers('xml', TRUE);
@@ -612,7 +617,7 @@ class MxitAPI {
     public function delete_avatar() {
         $this->_check_scope('delete_avatar', 'avatar/write');
 
-        $url = "http://api.mxit.com/user/avatar";
+        $url = $this->_base_api_url ."user/avatar";
         
         $this->_api_headers();
         $this->_call_api($url, 'DELETE');
@@ -630,7 +635,7 @@ class MxitAPI {
     public function list_gallery_folders() {
         $this->_check_scope('list_gallery_folders', 'content/read');
 
-        $url = "http://api.mxit.com/user/media/";
+        $url = $this->_base_api_url ."user/media/";
 
         $this->_api_headers();
         $this->_call_api($url, 'GET');
@@ -650,7 +655,7 @@ class MxitAPI {
     public function list_gallery_items($folder, $skip=0, $count=0) {
         $this->_check_scope('list_gallery_items', 'content/read');
 
-        $url = "http://api.mxit.com/user/media/list/". urlencode($folder);
+        $url = $this->_base_api_url ."user/media/list/". urlencode($folder);
 
         if ($skip != 0) {
             $url .= '?skip='. $skip;
@@ -679,7 +684,7 @@ class MxitAPI {
     public function create_gallery_folder($folder) {
         $this->_check_scope('create_gallery_folder', 'content/write');
 
-        $url = "http://api.mxit.com/user/media/". urlencode($folder);
+        $url = $this->_base_api_url ."user/media/". urlencode($folder);
 
         $this->_api_headers();
         $this->_call_api($url, 'POST');
@@ -697,12 +702,11 @@ class MxitAPI {
     public function rename_gallery_folder($source, $destination) {
         $this->_check_scope('rename_gallery_folder', 'content/write');
         
-        $url = "http://api.mxit.com/user/media/". urlencode($source);
+        $url = $this->_base_api_url ."user/media/". urlencode($source);
 
         $this->_api_headers();
         $this->_call_api($url, 'PUT', json_encode($destination));
     }
-
 
     /**
      *   Delete a gallery folder for a MXit user with the given UserId contained in the access token.
@@ -716,7 +720,7 @@ class MxitAPI {
     public function delete_gallery_folder($folder) {
         $this->_check_scope('delete_gallery_folder', 'content/write');
         
-        $url = "http://api.mxit.com/user/media/". urlencode($folder);
+        $url = $this->_base_api_url ."user/media/". urlencode($folder);
 
         $this->_api_headers();
         $this->_call_api($url, 'DELETE');
@@ -734,7 +738,7 @@ class MxitAPI {
     public function download_gallery_image($file_id) {
         $this->_check_scope('download_gallery_image', 'content/read');
 
-        $url = "http://api.mxit.com/user/media/content/". $file_id;
+        $url = $this->_base_api_url ."user/media/content/". $file_id;
 
         $this->_api_headers();
         $this->_call_api($url, 'GET', '', FALSE);
@@ -754,7 +758,7 @@ class MxitAPI {
     public function upload_gallery_image($folder, $filename, $mime_type, $base64_encoded_content) {
         $this->_check_scope('upload_gallery_image', 'content/write');
 
-        $url = "http://api.mxit.com/user/media/file/". urlencode($folder) .'?fileName='. urlencode($filename) .'&mimeType='. urlencode($mime_type);
+        $url = $this->_base_api_url ."user/media/file/". urlencode($folder) .'?fileName='. urlencode($filename) .'&mimeType='. urlencode($mime_type);
         $xml = '<base64Binary xmlns="http://schemas.microsoft.com/2003/10/Serialization/">'. $base64_encoded_content .'</base64Binary>';
 
         $this->_api_headers('xml', TRUE);
@@ -773,7 +777,7 @@ class MxitAPI {
     public function rename_gallery_image($file_id, $destination) {
         $this->_check_scope('rename_gallery_image', 'content/write');
 
-        $url = "http://api.mxit.com/user/media/file/". urlencode($file_id);
+        $url = $this->_base_api_url ."user/media/file/". urlencode($file_id);
         
         $this->_api_headers();
         $this->_call_api($url, 'PUT', json_encode($destination));
@@ -791,7 +795,7 @@ class MxitAPI {
     public function delete_gallery_image($file_id) {
         $this->_check_scope('delete_gallery_image', 'content/write');
 
-        $url = "http://api.mxit.com/user/media/file/". urlencode($file_id);
+        $url = $this->_base_api_url ."user/media/file/". urlencode($file_id);
         
         $this->_api_headers();
         $this->_call_api($url, 'DELETE');
