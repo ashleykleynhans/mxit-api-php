@@ -29,6 +29,10 @@ try {
         echo ($api->http_status == 200) ? 'successful' : 'failed';
         echo "<br />";
 
+    } elseif (isset($_GET) && isset($_GET['error']) && isset($_GET['error_description'])) {
+        echo "<h2>There was an error requesting access from the API</h2>";
+        echo '<strong>Error:</strong> '. $_GET['error'] .'<br />';
+        echo '<strong>Error Description:</string> '. $_GET['error_description'] .'<br />';
     } else {
         $api->request_access('http://www.example.com', 'graph/read status/write avatar/write');
     }
