@@ -368,7 +368,7 @@ Set the status message for the userid contained in the access token.
 #### Once MXit redirects to your application
 
     $api->get_user_token($_GET['code'], 'http://www.example.com');
-    $contacts = $api->set_status('test status');
+    $api->set_status('test status');
 
 ## set_avatar
 #### *Description*
