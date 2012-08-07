@@ -1,7 +1,7 @@
 <?php
 
 /**
- * MXit API PHP Wrapper - version 1.2.5
+ * MXit API PHP Wrapper - version 1.3.0
  *
  * Written by: Ashley Kleynhans <ashley@mxit.com>
  *
@@ -62,7 +62,7 @@ class MxitAPI {
     public $error;
 
     public function __construct($key, $secret) {
-        $this->_version = '1.2.5';
+        $this->_version = '1.3.0';
         $this->_base_outh_url = 'https://auth.mxit.com/';
         $this->_base_api_url = 'http://api.mxit.com/';
 
@@ -799,6 +799,25 @@ class MxitAPI {
         
         $this->_api_headers();
         $this->_call_api($url, 'DELETE');
+    }
+
+    /**
+     *   Upload a file of any type to store and return a FileId once file offer has been sent
+     *
+     *   Url: http://api.mxit.com/user/media/file/send?fileName={FILENAME}&mimeType={MIMETYPE}&userId={USERID}
+     *
+     *   User Token Required
+     *
+     *   Required scope: content/send
+     */
+    public function send_file($user_id, $filename, $mime_type, $base64_encoded_content) {
+        $this->_check_scope('send_file', 'content/send');
+
+        $url = $this->_base_api_url ."user/media/file/send?fileName=". urlencode($filename) .'&mimeType='. urlencode($mime_type) .'&userId='. urlencode($user_id);
+        $xml = '<base64Binary xmlns="http://schemas.microsoft.com/2003/10/Serialization/">'. $base64_encoded_content .'</base64Binary>';
+
+        $this->_api_headers('xml', TRUE);
+        $this->_call_api($url, 'POST', $xml);
     }
 
 }

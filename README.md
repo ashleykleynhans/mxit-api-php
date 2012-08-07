@@ -58,6 +58,8 @@ Gets an OAuth2 token for a user once they have granted permissions to an applica
 The request_access() method must be called, before this method is called.
 This method processes the code returned from request_access() and obtains an OAuth2 token.
 
+**NOTE: The redirect URI specified in the get_user_token() method must match the redirect URI specified in the request_access() method, otherwise the OAuth2 server will not grant you a valid OAuth2 token.**
+
 #### *Parameters*
 
 *code*: string
