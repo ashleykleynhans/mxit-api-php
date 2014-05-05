@@ -224,6 +224,33 @@ class MxitAPI {
         return $authenticated;
     }
 
+    public function refresh_token() {
+        $url = $this->_base_outh_url . "token";
+        $params = array(
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $this->_refresh_token,
+        );
+
+        $this->_headers = array();
+        $this->_headers[] = 'Authorization: Basic '. base64_encode($this->_app_key .':'. $this->_app_secret);
+        $this->_headers[] = "Content-Type: application/x-www-form-urlencoded";
+
+        $this->_call_api($url, 'POST', $params);
+
+        if ($this->error === FALSE) {
+            $this->_access_token = $this->result->access_token;
+            $this->_token_type = $this->result->token_type;
+            $this->_expires_in = $this->result->expires_in;
+            $this->_refresh_token = isset($this->result->refresh_token) ? $this->result->refresh_token : null;
+            $this->_scope = $this->result->scope;
+
+            // Only applicable to OpenID token requests
+            if (isset($this->result->id_token))
+                $this->_id_token = $this->result->id_token;
+        }
+
+    }
+
     /**
      *   Request the actual token from the OAuth2 server
      */
@@ -448,20 +475,52 @@ class MxitAPI {
 
     /**
      *   Send a message to one or more MXit users.
-     *
      *   Url: http://api.mxit.com/message/send/
-     *
      *   Application Token Required
+     *   Required scope: message/send or message/user
      *
-     *   Required scope: message/send
+     *   @param string $from
+     *   @param string $to
+     *   @param string $message
+     *   @param boolean $contains_markup
+     *   @param array $links array of associative arrays
+     *   http://dev.mxit.com/docs/api/messaging/post-message-send
+     *
+     *   <code>
+     *   $links = array(
+     *       array(
+     *           'CreateTemporaryContact':true,
+     *           'TargetService':'Service name',
+     *           'Text':'Link text'
+     *       );
+     *   );
+     *   </code>
+     *
+     *   @param boolean $spool
+     *   @param int $spool_timeout 
+     *
+     *   @return int error code see http://dev.mxit.com/docs/common-error-codes 
+     *   for details
      */
-    public function send_message($from, $to, $message, $contains_markup) {
-        $this->_check_scope('send_message', 'message/send');
+    public function send_message($from, $to, $message, $contains_markup=true, $links=array(), $spool=true, $spoolTimeOut=3600) {
+        try {
+            $this->_check_scope('send_message', 'message/send');
+        } catch(Exception $e) {
+            $this->_check_scope('send_message', 'message/user');
+        }
 
-        $params = array('Body'              => $message,
-                        'ContainsMarkup'    => $contains_markup,
-                        'From'              => $from,
-                        'To'                => $to);
+        $params = array(
+            'Body'              => $message,
+            'ContainsMarkup'    => $contains_markup,
+            'From'              => $from,
+            'To'                => $to,
+            'Spool'             => $spool,
+            'SpoolTimeOut'      => $spoolTimeOut,
+        );
+
+        if(count($links) > 0) {
+            $params['Links'] = $links;
+        }
 
         $url = $this->_base_messaging_api_url ."send/";
         
